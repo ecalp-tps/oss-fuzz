@@ -18,6 +18,9 @@
 #include "fuzzer_temp_file.h"
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    if (size < 1) {
+        return 0;
+    }
     GError *error = NULL;
     GdkPixbuf *pixbuf;
     GFile *file;
