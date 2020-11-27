@@ -26,18 +26,23 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     cairo_status_t status;
     cairo_text_extents_t extents;
     cairo_text_cluster_t cluster;
+    size_t new_size = size - glyph_range;
+    uint8_t *new_data = (uint8_t *) calloc(new_size, sizeof(uint8_t));
+    // Skip first glyph_range number of bytes
+    memcpy(new_data, &data[glyph_range], new_size * sizeof(uint8_t));
 
-    char *tmpfile = fuzzer_get_tmpfile(data, size);
+    char *tmpfile = fuzzer_get_tmpfile(new_data, new_size);
     surface = cairo_image_surface_create_from_png(tmpfile);
     status = cairo_surface_status(surface);
     if (status != CAIRO_STATUS_SUCCESS) {
+        free(new_data);
         fuzzer_release_tmpfile(tmpfile);
         return 0;
     }
 
-    char *buf = (char *) calloc(size + 1, sizeof(char));
-    memcpy(buf, data, size);
-    buf[size] = '\0';
+    char *buf = (char *) calloc(new_size + 1, sizeof(char));
+    memcpy(buf, new_data, new_size);
+    buf[new_size] = '\0';
 
     cr = cairo_create(surface);
     cairo_text_extents(cr, buf, &extents);
@@ -53,6 +58,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     cairo_destroy(cr);
     cairo_surface_destroy(surface);
+    free(new_data);
     free(buf);
     fuzzer_release_tmpfile(tmpfile);
     return 0;
