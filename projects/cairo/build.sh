@@ -14,11 +14,6 @@
 # limitations under the License.
 #
 ################################################################################
-# TODO: These flags are added since ubsan build fails. These checks should be
-# enabled later.
-export CFLAGS="$CFLAGS -fno-sanitize=vptr"
-export CXXFLAGS="$CXXFLAGS -fno-sanitize=vptr"
-
 PREFIX=$WORK/prefix
 mkdir -p $PREFIX
 
