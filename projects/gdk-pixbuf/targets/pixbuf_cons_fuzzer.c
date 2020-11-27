@@ -19,17 +19,19 @@ const int width = 10;
 const int height = 20;
 const int rowstride = width * 4;
 
+const int skip_size = 1;
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if (!(size >= (width * height * 4) + 1)) {
+    if (!(size >= (width * height * 4) + skip_size)) {
         return 0;
     }
     const gchar *profile;
     GdkPixbuf *pixbuf, *tmp;
     GBytes *bytes;
     unsigned int rot_amount = ((unsigned int) data[0]) % 4;
-    size_t new_size = size - 1;
+    size_t new_size = size - skip_size;
     uint8_t *new_data = (uint8_t *) calloc(new_size, sizeof(uint8_t));
-    memcpy(new_data, data + 1, new_size);
+    memcpy(new_data, &data[skip_size], new_size);
 
     bytes = g_bytes_new(new_data, new_size);
     pixbuf = g_object_new(GDK_TYPE_PIXBUF,

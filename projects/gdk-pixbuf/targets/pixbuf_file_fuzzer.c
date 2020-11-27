@@ -17,7 +17,8 @@
 
 #include "fuzzer_temp_file.h"
 
-const int min_size = 2;
+const int skip_size = 1;
+const int min_size = skip_size + 1;
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if (size < min_size) {
@@ -26,9 +27,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     GError *error = NULL;
     GdkPixbuf *pixbuf;
     unsigned int rot_amount = ((unsigned int) data[0]) % 4;
-    size_t new_size = size - 1;
+    size_t new_size = size - skip_size;
     uint8_t *new_data = (uint8_t *) calloc(new_size, sizeof(uint8_t));
-    memcpy(new_data, data + 1, new_size);
+    memcpy(new_data, &data[skip_size], new_size);
 
     char *tmpfile = fuzzer_get_tmpfile(new_data, new_size);
     pixbuf = gdk_pixbuf_new_from_file(tmpfile, &error);
